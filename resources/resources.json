@@ -1,0 +1,48 @@
+{
+"pi": {
+   "name": "Falaleev Mikhail Pi",
+   "description": "A simple WoT-connected Raspberry PI for the WoT book.",
+   "port": 8484,
+   "sensors": {
+
+        "temperature": {
+            "name": "Temperature Sensor",
+            "description": "An ambient temperature sensor.",
+            "unit": "celsius",
+            "value": 0,
+            "gpio": 12
+        },
+        "humidity": {
+            "name": "Humidity Sensor",
+
+            "description": "An ambient humidity sensor.",
+            "unit": "%",
+            "value": 0,
+            "gpio": 12
+        },
+        "pir": {
+            "name": "Passive Infrared",
+            "description": "A passive infrared sensor. When 'true' someone is present.",
+            "value": true,
+            "gpio": 17
+        }
+   },
+   "actuators": {
+        "leds": {
+            "1": {
+                 "name": "LED 1",
+                 "value": false,
+                 "gpio": 4
+            }
+          },
+        "buzzer": {
+            "name": "piezo buzzer",
+            "description": "makes annoing sound",
+            "value": false,
+            "gpio": 22
+
+
+      }
+   }
+}
+}

@@ -1,0 +1,32 @@
+{
+  "name": "diploma-wot",
+  "description": "Examples for the Web of Things Book",
+  "author": "alaleev Mikhail",
+  "dependencies": {
+    "cors": "^2.8.4",
+    "express": "^4.16.2",
+    "node-dht-sensor": "0.0.34",
+    "onoff": "^1.2.0",
+    "readline": "^1.3.0"
+  },
+  "engine": "node >= 0.12.0",
+  "version": "1.0.0",
+  "main": "./wot-server.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/falaleevms/wot-diploma.git"
+  },
+  "keywords": [
+    "wot",
+    "iot"
+  ],
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/falaleevms/wot-diploma/issues"
+  },
+  "homepage": "https://github.com/falaleevms/wot-diploma#readme"
+}
