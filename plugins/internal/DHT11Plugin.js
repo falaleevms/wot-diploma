@@ -6,7 +6,6 @@ var pluginName = 'Temperature & Humidity';
 var localParams = {'simulate': false, 'frequency': 2000};
 
 exports.start = function (params) {
-    console.info('%s plugin start', pluginName)
     localParams = params;
     if (localParams.simulate) {
         simulate();
@@ -45,7 +44,7 @@ function connectHardware() {
         sensor.read();
     } else {
         console.warn('Failed to initialize sensor!');
-}
+    } 
 
 }
 

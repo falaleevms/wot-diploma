@@ -2,6 +2,7 @@ var resources = require('./../../resources/model');
 var interval, sensor;
 var model = resources.pi.sensors.pir;
 var pluginName = resources.pi.sensors.pir.name;
+var observer = resources.observer.get('pi.sensors.pir');
 var localParams = {'simulate': false, 'frequency': 2000};
 
 exports.start = function (params) {
@@ -26,7 +27,8 @@ function connectHardware() {
     sensor = new Gpio(model.gpio, 'in', 'both');
     sensor.watch(function (err, value) {
         if (err) exit(err);
-        model.value = !!value;
+        // model.value = !!value;
+        observer.set('value', !!value)
         showValue();
     });
     console.info('Hardware %s sensor started!', pluginName);

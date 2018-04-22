@@ -33,6 +33,11 @@
                  "name": "LED 1",
                  "value": false,
                  "gpio": 4
+            },
+            "2": {
+                 "name": "LED 2",
+                 "value": false,
+                 "gpio": 5
             }
           },
         "buzzer": {
