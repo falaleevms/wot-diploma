@@ -44,7 +44,7 @@ function connectHardware() {
         sensor.read();
     } else {
         console.warn('Failed to initialize sensor!');
-    } 
+    }
 
 }
 
