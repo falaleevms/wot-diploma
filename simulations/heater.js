@@ -9,7 +9,6 @@ server.on('request', function(req, res) {
       res.code = '4.06';
       return res.end();
   }
-  payload = (JSON.parse(req.read().toString('utf8')))
   res.code = '2.05';
   res.setOption('Content-Format', 'application/json');
     switch (req.url) {
@@ -27,6 +26,7 @@ server.on('request', function(req, res) {
                 res.end(JSON.stringify(heaterData.volume));
             }
             else if (req.method == 'PUT') {
+                payload = (JSON.parse(req.read().toString('utf8')))
                 heaterData.volume=payload.volume;
                 res.end(JSON.stringify(heaterData));
             }
@@ -39,6 +39,8 @@ server.on('request', function(req, res) {
             res.code = '4.04';
             res.end();
         }
+
+        console.log("current volume:" + heaterData.volume)
 })
 
 server.listen(() => {console.log("Coap server started on port: " + server._port)})
