@@ -7,9 +7,9 @@ var pirPlugin = require('./plugins/internal/pirPlugin'),
     ledsPlugin = require('./plugins/internal/ledsPlugin'),
     coapPlugin = require('./plugins/external/coapPlugin');
 
-pirPlugin.start({'simulate': false, 'frequency': 2000});
-dhtPlugin.start({'simulate': false, 'frequency': 10000});
-ledsPlugin.start({'simulate': false, 'frequency': 10000});
+// pirPlugin.start({'simulate': false, 'frequency': 2000});
+// dhtPlugin.start({'simulate': false, 'frequency': 10000});
+// ledsPlugin.start({'simulate': false, 'frequency': 10000});
 coapPlugin.start({'simulate': false, 'frequency': 10000});
 
 var server = httpServer.listen(resources.pi.port, function () {
