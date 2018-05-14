@@ -1,0 +1,160 @@
+{
+  "id": "http://localhost:8484",
+  "name":"Falaleev Mikhail Pi",
+  "description": "Test implementation of web Thing",
+  "tags": [
+    "raspberry",
+    "pi",
+    "WoT"
+  ],
+  "customFields": {
+    "hostname":"localhost",
+    "port": 8484,
+    "secure": false,
+    "dataArraySize" : 30
+  },
+  "links":  {
+          "product": {
+              "link": "https://www.raspberrypi.org/products/raspberry-pi-2-model-b/",
+              "title": "Product this Web Thing is based on"
+          },
+          "properties": {
+              "link": "/properies",
+              "title": "List of Properties",
+              "resources": {
+                  "temperature": {
+                      "name": "Temperature Sensor",
+                      "description": "An ambient temperature sensor.",
+                      "values": {
+                          "t":{
+                            "name": "Temperature value",
+                            "description": "The temperature in celsius",
+                            "unit": "celsius",
+                            "customFields": {
+                                "gpio": 17
+                            }
+                          }
+                      }
+                  },
+                  "humidity": {
+                      "name": "Humidity Sensor",
+                      "description": "An ambient humidity sensor.",
+                      "values": {
+                        "h": {
+                          "name": "Humidity",
+                          "description": "Percentage of Humidity",
+                          "unit": "%",
+                          "customFields": {
+                            "gpio": 17
+                          }
+                        }
+                      },
+                      "tags": [
+                        "sensor",
+                        "public"
+                      ]
+                  },
+                  "pir": {
+                    "name": "Passive Infrared",
+                    "description": "A passive infrared sensor.",
+                    "values": {
+                      "presence": {
+                        "name": "Presence",
+                        "description": "Current sensor value (true=motion detected)",
+                        "type": "boolean",
+                        "customFields": {
+                          "gpio": 18
+                        }
+                      }
+                    },
+                    "tags": [
+                      "sensor",
+                      "public"
+                    ]
+                  },
+                  "leds": {
+                    "name": "LEDs",
+                    "description": "The LEDs of this device.",
+                    "values": {
+                      "1": {
+                        "name": "LED 1",
+                        "customFields": {
+                          "gpio": 4
+                        }
+                      },
+                      "2": {
+                        "name": "LED 2",
+                        "customFields": {
+                          "gpio": 5
+                        }
+                      }
+                    },
+                    "tags": [
+                      "sensor",
+                      "public"
+                    ]
+                  },
+                  "buzzer": {
+                      "name": "piezo buzzer",
+                      "description": "makes annoing sound",
+                      "values": {
+                          "name": "buzzer state",
+                          "description": "Buzzre is off or on... easy, isn't it?",
+                          "type": "boolean",
+                          "customFields": {
+                              "gpio": 22
+                          }
+                      },
+                      "tags": [
+                        "sensor",
+                        "public"
+                      ]
+                  }
+              }
+          },
+          "actions": {
+              "link": "/actions",
+              "title": "Actions of this Web Thing",
+              "resources": {
+                "ledState": {
+                  "name": "Change LED state",
+                  "description": "Change the state of an LED",
+                  "values": {
+                    "ledId": {
+                          "type": "enum",
+                          "enum":{"1":"LED 1","2":"LED 2","ALL":"All LEDs"},
+                          "required": true
+                    },
+                    "state": {
+                          "type": "boolean",
+                          "required": true
+                    }
+                  }
+                },
+                "buzzerState": {
+                  "name": "Change buzzer state",
+                  "description": "Change the state of an LED",
+                  "values": {
+                    "state": {
+                          "type": "boolean",
+                          "required": true
+                    }
+                  }
+                }
+              }
+          },
+
+          "type": {
+            "link": "http://model.webofthings.io/",
+            "title": "Instance type of the Pi"
+          },
+          "help": {
+            "link": "http://webofthings.org/docs/pi/",
+            "title": "Documentation"
+          },
+          "ui": {
+            "link": "/",
+            "title": "User Interface"
+          }
+  }
+}
