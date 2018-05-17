@@ -7,6 +7,7 @@
     "coap": "~0.21.0",
     "cors": "^2.8.4",
     "express": "^4.16.2",
+    "lodash": "^4.17.10",
     "msgpack5": "^4.0.1",
     "node-json2html": "^1.2.0",
     "node-uuid": "^1.4.8",

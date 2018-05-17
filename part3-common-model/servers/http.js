@@ -1,10 +1,10 @@
 var express = require('express'),
     routesCreator = require('./../routes/routesCreator'),
-    resources = require('./../resources/model'),
+    resources = require('./../resources/model').subject,
     actuatorsRoutes = require('./../routes/actuators'),
     sensorRoutes = require('./../routes/sensors'),
     thingsRoutes = require('./../routes/things')
-    resources = require('./../resources/model'),
+    observer = require('./../resources/model'),
     cors = require('cors'),
     converter = require('./../middleware/converter'),
     bodyParser = require('body-parser');
@@ -19,7 +19,7 @@ app.use(cors());
 // app.use('/things', thingsRoutes);
 
 // Create Routes
-app.use('/', routesCreator.create(resources));
+app.use('/', routesCreator.create(observer));
 
 app.get('/pi', function (req, res) {
  res.send('This is the WoT-Pi!')

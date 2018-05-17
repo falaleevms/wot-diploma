@@ -1,7 +1,7 @@
 var httpServer = require('./servers/http'),
-    resources = require('./resources/model')
-    wsServer = require('./servers/websockets');
-
+    observer = require('./resources/model')
+    wsServer = require('./servers/websockets'),
+    model = observer.subject;
 // var pirPlugin = require('./plugins/internal/pirPlugin'),
 //     dhtPlugin = require('./plugins/internal/DHT11Plugin.js');
 //     ledsPlugin = require('./plugins/internal/ledsPlugin'),
@@ -12,8 +12,8 @@ var httpServer = require('./servers/http'),
 // ledsPlugin.start({'simulate': false, 'frequency': 10000});
 // coapPlugin.start({'simulate': false, 'frequency': 10000});
 
-var server = httpServer.listen(resources.customFields.port, function () {
+var server = httpServer.listen(model.customFields.port, function () {
     wsServer.listen(server);
     console.info('Your WoT Pi is up and running on port %s',
-    resources.customFields.port);
+    model.customFields.port);
 });

@@ -19,7 +19,7 @@
               "title": "Product this Web Thing is based on"
           },
           "properties": {
-              "link": "/properies",
+              "link": "/properties",
               "title": "List of Properties",
               "resources": {
                   "temperature": {
@@ -87,7 +87,8 @@
                         "customFields": {
                           "gpio": 5
                         }
-                      }
+                      },
+                      "data": []
                     },
                     "tags": [
                       "sensor",

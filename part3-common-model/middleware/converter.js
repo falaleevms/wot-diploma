@@ -33,7 +33,8 @@ module.exports = function() {
 
     }
     else {
-      next(); 
+      console.debug("no result in converter")
+      next();
     }
   }
 };

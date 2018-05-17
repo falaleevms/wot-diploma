@@ -1,11 +1,5 @@
-var resources = require('./../../resources/model');
-var observer = resources.observer;
-
-// 
-//
-// var resources =
-// var observer = require('./../../resources/model');
-// var resources = obsever.subject
+var observer = require('./../../resources/model');
+var resources = obsever.subject
 
 var actuator, interval;
 var model = resources.pi.actuators.leds;
