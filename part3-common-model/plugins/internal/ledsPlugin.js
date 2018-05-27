@@ -1,31 +1,20 @@
-var observer = require('./../../resources/model');
-var resources = obsever.subject
+var CorePlugin = require('./../corePlugin').CorePlugin,
+  util = require('util'),
+  utils = require('./../../utils/utils.js');
 
-var actuator, interval;
-var model = resources.pi.actuators.leds;
-var pluginName = model.name;
-var localParams = {'simulate': false, 'frequency': 2000};
-var leds = [];
+var actuator, model;
+var leds = {};
 
-exports.start = function (params) {
-  localParams = params;
-  //observe(model);
-  for(var ledId in model){
-      observe("pi.actuators.leds." + [ledId], ledId); //leds[ledId]
-  }
-  if (localParams.simulate) {
-    simulate();
-  } else {
-    connectHardware();
-  }
+var LedsPlugin = exports.LedsPlugin = function (params) { //#A
+  CorePlugin.call(this, params, 'leds',
+    stop, ['ledState'], switchOnOff);
+  model = this.model;
+  this.addValue(false);
 };
+util.inherits(LedsPlugin, CorePlugin);
 
-exports.stop = function () {
-  if (localParams.simulate) {
-    clearInterval(interval);
-  } else {
-    actuator.unexport();
-  }
+function stop() {
+  actuator.unexport();
   console.info('%s plugin stopped!', pluginName);
 };
 
@@ -36,34 +25,45 @@ function observe(what, ledId) {
       });
 };
 
-function switchOnOff(value, ledId) {
-  if (!localParams.simulate) {
-    leds[ledId].write(value === true ? 1 : 0, function () {
-      console.info('Changed value of led %s to %s', ledId, value);
-    });
-  }
-};
-
-function connectHardware() {
-  var Gpio = require('onoff').Gpio;
-  for(var ledId in model){
-      leds[ledId] = new Gpio(model[ledId].gpio , 'out');
-  }
-  console.info('Hardware leds plugin started!');
-
-  // thisObserver_ = observer.get("pi.actuators.leds.1");
-  // thisObserver_.on('change', function (changes) {
-  //       console.info('thisObserver_');
-  // });
-};
-
-function simulate() {
-  interval = setInterval(function () {
-    if (model.value) {
-      model.value = false;
-    } else {
-      model.value = true;
+function switchOnOff(value) {
+    let ledsIdToSwitch;
+    if (value.ledId=="All"){
+      ledsIdToSwitch=Object.keys(leds)
     }
-  }, localParams.frequency);
-  console.info('Simulated %s actuator started!', pluginName);
+    else {
+       ledsIdToSwitch=[value.ledId]
+    }
+    for (var i=0; i<ledsIdToSwitch.length; i++){
+      let ledId=ledsIdToSwitch[i];
+      leds[ledId].write(value.ledState === true ? 1 : 0, function () {
+        console.info('Changed value of led %s to %s', ledId, value.ledState);
+      });
+    }
+    this.addValue(value)
+
+};
+
+LedsPlugin.prototype.connectHardware = function() {
+  var Gpio = require('onoff').Gpio;
+  for(var ledId in this.model.values){
+      leds[ledId] = new Gpio(this.model.values[ledId].customFields.gpio , 'out');
+      console.info('led stated: ' + this.model.values[ledId].name);
+  }
+};
+
+LedsPlugin.prototype.createValue = function (data){
+  let createdValue={};
+  let state = data.ledState;
+  let id = data.ledId;
+
+  for (var ledId in this.model.values){
+    if (id == "All") {
+      createdValue[ledId]=state;
+    }
+    else if (id == ledId) {
+      createdValue[ledId]=state;
+    }
+  }
+  createdValue["timestamp"] = utils.isoTimestamp();
+  return createdValue;
 };

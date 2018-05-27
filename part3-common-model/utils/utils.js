@@ -63,3 +63,7 @@ exports.findObjectInArray = function(array, filterObj) {
   //TODO: should be made async (what if array is big!)
   return _.find(array, filterObj);
 };
+
+exports.findPropertyObserver = function(propertyId){
+  return observer.get('links.properties.resources.'+propertyId);
+};

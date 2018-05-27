@@ -1,47 +1,35 @@
-var resources = require('./../../resources/model');
-var interval, sensor;
-var model = resources.pi.sensors.pir;
-var pluginName = resources.pi.sensors.pir.name;
-var observer = resources.observer.get('pi.sensors.pir');
-var localParams = {'simulate': false, 'frequency': 2000};
+var CorePlugin = require('./../corePlugin').CorePlugin,
+  util = require('util'),
+  utils = require('./../../utils/utils.js');
 
-exports.start = function (params) {
-    localParams = params;
-    if (localParams.simulate) {
-        simulate();
-    } else {
-        connectHardware();
-    }
-};
-exports.stop = function () {
-   if (localParams.simulate) {
-      clearInterval(interval);
-   } else {
-      sensor.unexport();
-   }
-   console.info('%s plugin stopped!', pluginName);
+
+var interval, sensor, model;
+var PirPlugin = exports.PirPlugin = function (params) {
+  CorePlugin.call(this, params, 'pir', stop);
+  model = this.model;
+  this.addValue(false);
 };
 
-function connectHardware() {
+util.inherits(PirPlugin, CorePlugin);
+
+function stop() {
+  sensor.unexport();
+  console.info('%s plugin stopped!', pluginName);
+};
+
+PirPlugin.prototype.connectHardware = function() {
     var Gpio = require('onoff').Gpio;
-    sensor = new Gpio(model.gpio, 'in', 'both');
+    sensor = new Gpio(this.model.values.presence.customFields.gpio, 'in', 'both');
+    var self=this;
     sensor.watch(function (err, value) {
         if (err) exit(err);
         // model.value = !!value;
-        observer.set('value', !!value)
-        showValue();
+        self.addValue(!!value);
+        self.showValue();
     });
-    console.info('Hardware %s sensor started!', pluginName);
+    console.info('Hardware %s sensor started!', model.name);
 };
 
-function simulate() {
-    interval = setInterval(function () {
-    model.value = !model.value;
-    showValue();
-    }, localParams.frequency);
-    console.info('Simulated %s sensor started!', pluginName);
-};
-
-function showValue() {
-     console.info(model.value ? 'movement spoted!' : 'not anymore!');
+PirPlugin.prototype.createValue = function (value){
+  return {"presence": value, "timestamp": utils.isoTimestamp()};
 };

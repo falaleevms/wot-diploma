@@ -34,7 +34,11 @@
                                 "gpio": 17
                             }
                           }
-                      }
+                      },
+                      "tags": [
+                        "sensor",
+                        "public"
+                      ]
                   },
                   "humidity": {
                       "name": "Humidity Sensor",
@@ -87,8 +91,7 @@
                         "customFields": {
                           "gpio": 5
                         }
-                      },
-                      "data": []
+                      }
                     },
                     "tags": [
                       "sensor",
