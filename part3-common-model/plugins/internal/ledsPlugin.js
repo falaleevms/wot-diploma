@@ -15,19 +15,19 @@ util.inherits(LedsPlugin, CorePlugin);
 
 function stop() {
   actuator.unexport();
-  console.info('%s plugin stopped!', pluginName);
+  console.info('%s plugin stopped!', model.name);
 };
 
-function observe(what, ledId) {
-  thisObserver = observer.get(what)
-  thisObserver.on('change', function (changes) {
-      switchOnOff(model[ledId].value, ledId);
-      });
-};
+// function observe(what, ledId) {
+//   thisObserver = this.observer.get(what)
+//   thisObserver.on('change', function (changes) {
+//       switchOnOff(model[ledId].value, ledId);
+//       });
+// };
 
 function switchOnOff(value) {
     let ledsIdToSwitch;
-    if (value.ledId=="All"){
+    if (value.ledId=="ALL"){
       ledsIdToSwitch=Object.keys(leds)
     }
     else {
@@ -35,8 +35,8 @@ function switchOnOff(value) {
     }
     for (var i=0; i<ledsIdToSwitch.length; i++){
       let ledId=ledsIdToSwitch[i];
-      leds[ledId].write(value.ledState === true ? 1 : 0, function () {
-        console.info('Changed value of led %s to %s', ledId, value.ledState);
+      leds[ledId].write(value.state === "true" ? 1 : 0, function () {
+        console.info('Changed value of led %s to %s', ledId, value.state);
       });
     }
     this.addValue(value)
@@ -57,10 +57,7 @@ LedsPlugin.prototype.createValue = function (data){
   let id = data.ledId;
 
   for (var ledId in this.model.values){
-    if (id == "All") {
-      createdValue[ledId]=state;
-    }
-    else if (id == ledId) {
+    if (id == "ALL" && id == ledId) {
       createdValue[ledId]=state;
     }
   }

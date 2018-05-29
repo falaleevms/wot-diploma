@@ -60,7 +60,6 @@ exports.cappedPush = function(arrayObserver, entry) {
 };
 
 exports.findObjectInArray = function(array, filterObj) {
-  //TODO: should be made async (what if array is big!)
   return _.find(array, filterObj);
 };
 

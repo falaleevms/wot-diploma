@@ -5,8 +5,10 @@
   "dependencies": {
     "body-parser": "^1.18.2",
     "coap": "~0.21.0",
+    "consolidate": "^0.15.1",
     "cors": "^2.8.4",
     "express": "^4.16.2",
+    "handlebars": "^4.0.11",
     "lodash": "^4.17.10",
     "msgpack5": "^4.0.1",
     "node-json2html": "^1.2.0",

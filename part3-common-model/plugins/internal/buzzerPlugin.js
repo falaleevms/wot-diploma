@@ -1,70 +1,41 @@
-var resources = require('./../../resources/model');
-var observer = resources.observer;
+var CorePlugin = require('./../corePlugin').CorePlugin,
+  util = require('util'),
+  utils = require('./../../utils/utils.js');
 
+var actuator, model;
 
-var actuator, interval;
-var model = resources.pi.actuators.leds;
-var pluginName = model.name;
-var localParams = {'simulate': false, 'frequency': 2000};
-var leds = [];
-
-exports.start = function (params) {
-  localParams = params;
-  //observe(model);
-  for(var ledId in model){
-      observe("pi.actuators.leds." + [ledId], ledId); //leds[ledId]
-  }
-  if (localParams.simulate) {
-    simulate();
-  } else {
-    connectHardware();
-  }
+var BuzzerPlugin = exports.BuzzerPlugin = function (params) { //#A
+  CorePlugin.call(this, params, 'buzzer',
+    stop, ['buzzerState'], switchOnOff);
+  model = this.model;
+  this.addValue(false);
 };
+
+util.inherits(BuzzerPlugin, CorePlugin);
 
 exports.stop = function () {
-  if (localParams.simulate) {
-    clearInterval(interval);
-  } else {
-    actuator.unexport();
-  }
-  console.info('%s plugin stopped!', pluginName);
+  actuator.unexport();
+  console.info('%s plugin stopped!', model.name);
 };
 
-function observe(what, ledId) {
-  thisObserver = observer.get(what)
-  thisObserver.on('change', function (changes) {
-      switchOnOff(model[ledId].value, ledId);
-      });
+function switchOnOff(value) {
+    actuator.write(value.state === "true" ? 1 : 0, function () {
+      console.info('Changed value %s to %s', model.name, value.state);
+  });
+  this.addValue(value)
 };
 
-function switchOnOff(value, ledId) {
-  if (!localParams.simulate) {
-    leds[ledId].write(value === true ? 1 : 0, function () {
-      console.info('Changed value of led %s to %s', ledId, value);
-    });
-  }
-};
-
-function connectHardware() {
+BuzzerPlugin.prototype.connectHardware = function() {
   var Gpio = require('onoff').Gpio;
-  for(var ledId in model){
-      leds[ledId] = new Gpio(model[ledId].gpio , 'out');
-  }
-  console.info('Hardware leds plugin started!');
-
-  // thisObserver_ = observer.get("pi.actuators.leds.1");
-  // thisObserver_.on('change', function (changes) {
-  //       console.info('thisObserver_');
-  // });
+  actuator = new Gpio(this.model.values.customFields.gpio , 'out');
+  console.info('Hardware buzzer plugin started!');
 };
 
-function simulate() {
-  interval = setInterval(function () {
-    if (model.value) {
-      model.value = false;
-    } else {
-      model.value = true;
-    }
-  }, localParams.frequency);
-  console.info('Simulated %s actuator started!', pluginName);
+BuzzerPlugin.prototype.createValue = function (data){
+  return {"beeping" : data.state, "timestamp" : utils.isoTimestamp()};
+};
+
+function stop() {
+  actuator.unexport();
+  console.info('%s plugin stopped!', model.name);
 };

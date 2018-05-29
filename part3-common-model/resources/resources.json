@@ -1,6 +1,6 @@
 {
-  "id": "http://localhost:8484",
-  "name":"Falaleev Mikhail Pi",
+  "id": "http://192.168.0.113:8484",
+  "name":"Pi - Falaleev Mikhail",
   "description": "Test implementation of web Thing",
   "tags": [
     "raspberry",
@@ -8,7 +8,7 @@
     "WoT"
   ],
   "customFields": {
-    "hostname":"localhost",
+    "hostname":"192.168.0.113:8484",
     "port": 8484,
     "secure": false,
     "dataArraySize" : 30
@@ -56,7 +56,8 @@
                       "tags": [
                         "sensor",
                         "public"
-                      ]
+                      ],
+                      "data": []
                   },
                   "pir": {
                     "name": "Passive Infrared",
@@ -74,7 +75,8 @@
                     "tags": [
                       "sensor",
                       "public"
-                    ]
+                    ],
+                    "data": []
                   },
                   "leds": {
                     "name": "LEDs",
@@ -102,8 +104,8 @@
                       "name": "piezo buzzer",
                       "description": "makes annoing sound",
                       "values": {
-                          "name": "buzzer state",
-                          "description": "Buzzre is off or on... easy, isn't it?",
+                          "name": "beeping",
+                          "description": "Buzzer is off or on... easy, isn't it?",
                           "type": "boolean",
                           "customFields": {
                               "gpio": 22
@@ -126,7 +128,7 @@
                   "values": {
                     "ledId": {
                           "type": "enum",
-                          "enum":{"1":"LED 1","2":"LED 2","ALL":"All LEDs"},
+                          "enum":{"LED 1":"1","LED 2":"2","All LEDs":"ALL"},
                           "required": true
                     },
                     "state": {

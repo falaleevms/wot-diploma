@@ -1,62 +1,53 @@
-var resources = require('./../../resources/model');
+var CorePlugin = require('./../corePlugin').CorePlugin,
+  util = require('util'),
+  utils = require('./../../utils/utils.js');
+var modelTemperature, modelHumidity, sensor;
 
-var interval, sensor;
-var model = resources.pi.sensors;
-var pluginName = 'Temperature & Humidity';
-var localParams = {'simulate': false, 'frequency': 2000};
-
-exports.start = function (params) {
-    localParams = params;
-    if (localParams.simulate) {
-        simulate();
-    } else {
-        connectHardware();
-    }
+var Dht11Plugin = exports.Dht11Plugin = function (params) {
+  CorePlugin.call(this, params, 'temperature', stop, null, null);
+  modelTemperature = this.model;
+  observerHumidity = utils.findPropertyObserver('humidity');
+  modelHumidity = observerHumidity.subject;
+  this.addValue([0, 0]);
 };
 
-exports.stop = function () {
- if (localParams.simulate) {
- clearInterval(interval);
- } else {
+util.inherits(Dht11Plugin, CorePlugin);
+
+stop = function () {
  sensor.unexport();
- }
  console.info('%s plugin stopped!', pluginName);
 };
 
-function connectHardware() {
+Dht11Plugin.prototype.connectHardware = function() {
     var sensorDriver = require('node-dht-sensor');
+    var self=this;
     var sensor = {
         initialize: function () {
-            return sensorDriver.initialize(11, model.temperature.gpio);
+            return sensorDriver.initialize(11, self.model.values.t.customFields.gpio);
         },
         read: function () {
             var readout = sensorDriver.read();
-            model.temperature.value = parseFloat(readout.temperature.toFixed(2));
-            model.humidity.value = parseFloat(readout.humidity.toFixed(2));
-            showValue();
+            self.addValue([parseFloat(readout.temperature.toFixed(2)),
+                            parseFloat(readout.humidity.toFixed(2))]);
+            self.showValues();
             setTimeout(function () {
                 sensor.read();
-                }, localParams.frequency);
+              }, 5000);
     }
     }
     if (sensor.initialize()) {
-        console.info('Hardware %s sensor started!', pluginName);
+        console.info('Hardware DHT11 sensor started!');
         sensor.read();
     } else {
         console.warn('Failed to initialize sensor!');
     }
-
 }
 
-function simulate() {
- interval = setInterval(function () {
- model.value = !model.value;
- showValue();
- }, localParams.frequency);
- console.info('Simulated %s sensor started!', pluginName);
+Dht11Plugin.prototype.addValue = function(values) {
+  utils.cappedPush(this.observer.get("data"), {"t": values[0], "timestamp": utils.isoTimestamp()});
+  utils.cappedPush(observerHumidity.get("data"), {"h": values[1], "timestamp": utils.isoTimestamp()});
 };
 
-function showValue() {
-  console.info('Temperature: %s C, humidity %s \%',
-    model.temperature.value, model.humidity.value);
+Dht11Plugin.prototype.showValues = function () {
+  console.info('Temperature: %s C, Humidity: %s \%', modelTemperature.data[modelTemperature.data.length-1].t, modelHumidity.data[modelHumidity.data.length-1].h);
 };

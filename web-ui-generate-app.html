@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Simple application to generate UI for web Things">
+    <meta name="author" content="Falaleev Mikhail">
+
+    <title>WoT UI generation</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+
+    <!-- Bootstrap core CSS -->
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.min.js"
+      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+      crossorigin="anonymous"></script>
+      <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+      integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+      crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+
+    <link href="./styles.css"  rel="stylesheet">
+  </head>
+
+  <body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <span class="navbar-brand" href="#">Universal UI for webThings</span>
+  <ul class="navbar-nav mr-auto">
+
+  </ul>
+  <form class="form-inline my-2 my-lg-0" >
+    <input id="newThingUrl" class="form-control mr-sm-2" type="search" value="192.168.0.113:8484" placeholder="URL" aria-label="Search">
+    <button class="btn btn-outline-success my-2 my-sm-0" type="button" onclick="addNewThing()">Add</button>
+  </form>
+</div>
+</nav>
+<div class="container">
+
+</div>
+
+<script>
+
+var thingUrl;
+function createNewThing(){
+  thingTemplate=`
+
+  `;
+  return thingTemplate;
+}
+
+
+function getThing(url) {
+  function requestUrl(_url){
+    let _res={};
+    $.ajax({
+      async: false,
+      url: _url,
+      headers: {
+        "Accept": "application/json"
+      },
+      success: function(data,status, jqXHR){
+        _res.model=data;
+        _res.headers = jqXHR.getAllResponseHeaders();
+      },
+      error: function(jqXHR, status, errorThrown){
+        alert(errorThrown + "[can not get access to "+url+"/model]");
+        res=null;
+      }
+
+    });
+    return _res;
+  }
+  let res={};
+  res.model = requestUrl(url+"/model").model;
+  return res;
+}
+
+function addNewThing() {
+  let thingUrl=$("#newThingUrl").val();
+  let thing=getThing("http://"+thingUrl);
+  if (thing){
+    newThing=generateNewThing(thing.model, thingUrl)
+    $(".container").append(newThing)
+  }
+}
+addNewThing();
+
+function generateNewThing(model, thingUrl){
+  let uid=uuidv4()
+  let propertiesHTML = generatePropeties(model.links.properties.resources, uid, thingUrl);
+  let actionsHTML = generateActions(model.links.actions.resources, uid, thingUrl);
+  let linksHTML = generateLinks(model.links, thingUrl);
+
+  let newThing=`
+  <div class="card" style="margin-top:2rem; padding: 1rem">
+    <h3><span class="badge badge-dark">${model.name}</span></h3>
+      <div>${model.description}</div>
+      <h4>Properties:</h4>
+      <div class="row">
+        ${propertiesHTML}
+      </div>
+      <h4>Actions:</h4>
+      <div class="row">
+        ${actionsHTML}
+      </div>
+      <h4>Links:</h4>
+      <div class="row">
+        ${linksHTML}
+      </div>
+  </div>
+  `
+  return newThing;
+}
+
+function generatePropeties(modelProperties, tId, thingUrl){
+  let propertiesHTML = "";
+  for (let propertieKey in modelProperties){
+    let modelProperty=modelProperties[propertieKey];
+    let propertyFieldsHTML=""
+
+    if (modelProperty.data){
+        let lastData=modelProperty.data[modelProperty.data.length-1]
+        for (let fieldKey in lastData){
+
+          propertyFieldHTML=`
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            ${fieldKey}
+            <span id="${tId}-${propertieKey}-${fieldKey}" class="badge badge-success badge-pill">${lastData[fieldKey]}</span>
+          </li>
+          `
+          propertyFieldsHTML+=propertyFieldHTML
+        }
+    }
+    let propertyHTML=`
+
+    <div class="property">
+    <div class="card">
+      <ul class="list-group">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <h5>${modelProperty.name}<h5>
+            </li>
+            ${propertyFieldsHTML}
+      </ul>
+    </div>
+    </div>
+    `;
+    propertiesHTML+=propertyHTML;
+    subscribeToWs("/properties/", propertieKey, tId, thingUrl)
+  }
+  return propertiesHTML;
+}
+
+function generateActions(modelActions, tId, tUrl){
+  let actionsHTML=""
+  for (let actionKey in modelActions){
+    let modelAction=modelActions[actionKey];
+    let actionFieldsHTML=""
+
+    for (let valueKey in modelAction.values){
+      valueModel=modelAction.values[valueKey];
+      let actionFieldHTML="";
+      if (valueModel.type == "enum" || valueModel.type == "boolean") {
+        let enumList;
+        if (valueModel.type == "boolean") enumList={"true": true, "false": false};
+        else enumList=valueModel.enum;
+        let options;
+        for (let enumKey in enumList){
+          let option = `
+          <option value=${enumList[enumKey]}>${enumKey}</option>
+          `
+          options+=option;
+        }
+        actionFieldHTML=`
+        <h6>${valueKey}</h6>
+        <select data-key=${valueKey} class="actionOptions" id="exampleFormControlSelect1">
+          ${options}
+        </select>
+        `
+      }
+      actionFieldsHTML+=actionFieldHTML
+    }
+    var actionUId=uuidv4()
+    let actionHTML=`
+    <div class="action">
+    <div class="card">
+      <ul class="list-group">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <h5>${modelAction.name}<h5>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+            <form  id="${actionUId}">
+            ${actionFieldsHTML}
+              <button type="button" class="btn btn-danger" onclick="submitAction('${actionUId}', '${tUrl}', '${actionKey}')">Send</button>
+            </form>
+            </li>
+      </ul>
+    </div>
+    </div>
+    `;
+    actionsHTML+=actionHTML;
+  }
+  return actionsHTML;
+}
+
+function generateLinks(modelLinks, thingUrl){
+  console.log(modelLinks)
+  let links='';
+  for (let linkKey in modelLinks){
+    linkUrl=modelLinks[linkKey].link
+    if (!(/http/.test(linkUrl))) linkUrl = "http://"+thingUrl+linkUrl
+    let link=`<a href="${linkUrl}" target="_blank" class="list-group-item list-group-item-action">${modelLinks[linkKey].title}</a>`;
+    links+=link;
+  }
+
+  linksHTML=`
+  <div class="list-group links">
+  ${links}
+  </div>
+  `
+  return linksHTML;
+
+};
+
+function subscribeToWs(url, propertieKey, tId, thingUrl) {
+    let socket = new WebSocket("ws://"+thingUrl+url+propertieKey);
+
+    socket.onmessage = function (event) {
+        let data = JSON.parse(event.data);
+        let lastData = data[data.length-1];
+        for (let fieldKey in lastData){
+            $("#"+tId+"-"+propertieKey+"-"+fieldKey).text(lastData[fieldKey]);
+        }
+    };
+}
+
+function submitAction(formID, thingUrl, actionKey) {
+  let values={};
+  $('#'+formID+' :input').filter(":not(:button)").each(function(ind) {
+    values[$(this).data("key")]=$(this).val();
+  });
+  console.log(values);
+  $.ajax({
+      type: "POST",
+      url: "http://"+thingUrl + "/actions/"+actionKey,
+      headers: {
+        "Accept": "application/json"
+      },
+      dataType: 'json',
+      contentType: 'application/json',
+      data: JSON.stringify(values),
+      error: function(e){
+        console.log(e)
+      }
+  });
+  console.log(thingUrl + "/actions/"+actionKey)
+}
+
+function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
+
+</script>
+  </body>
+</html>

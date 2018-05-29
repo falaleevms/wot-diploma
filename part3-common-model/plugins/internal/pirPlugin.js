@@ -2,7 +2,6 @@ var CorePlugin = require('./../corePlugin').CorePlugin,
   util = require('util'),
   utils = require('./../../utils/utils.js');
 
-
 var interval, sensor, model;
 var PirPlugin = exports.PirPlugin = function (params) {
   CorePlugin.call(this, params, 'pir', stop);

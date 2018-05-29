@@ -7,16 +7,26 @@ module.exports = function() {
     console.info('Representation converter middleware called!');
 
     if (req.result) {
-      if (req.accepts('json')) {
-        console.info('JSON representation selected!');
-        res.send(req.result);
-        return;
-      }
+
+      req.rooturl = req.headers.host;
+      // req.qp = req._parsedUrl.search;
 
       if (req.accepts('html')) {
-        console.info('HTML representation selected!');
-        var transform = {'tag': 'div', 'html': '${name} : ${value}'};
-        res.send(json2html.transform(req.result, transform));
+        console.info('HTMl representation selected!');
+
+        var helpers = {
+          json: function (object) {
+            return JSON.stringify(object);
+          },
+          getById: function (object, id) {
+            return object[id];
+          }
+        };
+
+        // Check if there's a custom renderer for this media type and resource
+        if (req.type) res.render(req.type, {req: req, helpers: helpers});
+        else res.render('default', {req: req, helpers: helpers});
+
         return;
       }
 
